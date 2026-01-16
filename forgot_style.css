@@ -1,0 +1,115 @@
+/* Basic reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Background */
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url('car_img/login.jpg') no-repeat center center/cover;
+}
+
+/* Container */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Card */
+.card {
+    background: rgba(0,0,0,0.6);
+    border-radius: 20px;
+    width: 380px;
+    padding: 40px 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+    text-align: center;
+}
+
+/* Card Content */
+.card-content h2 {
+    color: #00fff7;
+    text-shadow: 0 0 10px #00fff7, 0 0 20px #ff00ff;
+    margin-bottom: 10px;
+}
+
+.card-content p {
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+/* Input Fields */
+.input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    color: #fff;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid #00fff7;
+    background: rgba(0,0,0,0.3);
+    color: #fff;
+    outline: none;
+    font-size: 1rem;
+    box-shadow: 0 0 10px #00fff7, 0 0 20px #ff00ff;
+    transition: 0.3s;
+}
+
+.input-group input::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+.input-group input:focus {
+    border-color: #ff00ff;
+    box-shadow: 0 0 15px #ff00ff, 0 0 25px #00fff7;
+}
+
+/* Button */
+button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid #ff00ff;
+    background: linear-gradient(45deg, #ff00ff, #00fff7);
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 0 15px #ff00ff, 0 0 25px #00fff7;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px #ff00ff, 0 0 40px #00fff7;
+}
+
+/* Login link */
+.login-link {
+    margin-top: 15px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.login-link a {
+    color: #00fff7;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.login-link a:hover {
+    text-shadow: 0 0 10px #00fff7, 0 0 20px #ff00ff;
+}

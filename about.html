@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About | Car Tracking System</title>
+    <link rel="stylesheet" href="about.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="logo">Car<span>Track</span></div>
+    <nav>
+        <a href="index.html">Home</a>
+        
+        
+    </nav>
+</header>
+
+<!-- HERO SECTION -->
+<section class="hero">
+    <div class="hero-card">
+        <div class="hero-glow"></div>
+        <h1>Smart Car Tracking System</h1>
+        <p>
+            Real-time vehicle tracking with secure dashboards and modern GPS technology.
+            Monitor your fleet or personal vehicles effortlessly.
+        </p>
+        <a href="owner_registration.html" class="btn">Get Started</a>
+    </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section class="about">
+    <div class="about-text">
+        <h2>About Our Platform</h2>
+
+        <p>
+            The Car Tracking System is a modern GPS-based solution that allows vehicle owners
+            to track, monitor, and secure their vehicles in real time. Accurate location,
+            vehicle status, and driver details are displayed on a secure dashboard.
+        </p>
+
+        <p>
+            Each vehicle is connected with a GPS device sending continuous location data.
+            Owners can view the exact latitude, longitude, and last updated time.
+        </p>
+
+        <p>
+            Security is a key priority. Encrypted passwords and session-based authentication
+            ensure owners access only their vehicles. The system guarantees data privacy
+            and reliability.
+        </p>
+
+        <p>
+            Ideal for personal owners, fleet management, transport services, and logistics companies.
+            Enhance safety, reduce risks, and improve operational control with real-time insights.
+        </p>
+    </div>
+
+    <div class="features">
+        <div class="feature-card">
+            <h3>🚗 Vehicle Tracking</h3>
+            <p>Track vehicles live with accurate GPS data.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>📍 Live Location</h3>
+            <p>View real-time latitude and longitude updates.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>🔐 Secure System</h3>
+            <p>Protected login with encrypted authentication.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>📊 Smart Dashboard</h3>
+            <p>Clean, simple and responsive interface.</p>
+        </div>
+    </div>
+</section>
+
+<!-- MISSION SECTION -->
+<section class="mission">
+    <h2>Our Mission</h2>
+    <p>
+        Our mission is to deliver a reliable, secure, and user-friendly vehicle tracking
+        system that enhances safety and control for vehicle owners.
+    </p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <p>© 2026 Car Tracking System | All Rights Reserved</p>
+</footer>
+
+<!-- ================= JS FOR 3D CARD TILT ================= -->
+<script>
+const cards = document.querySelectorAll('.feature-card');
+
+cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
+
+        const rotateX = ((y - cy) / cy) * 10;
+        const rotateY = ((x - cx) / cx) * 10;
+
+        card.style.transform = `rotateX(${-rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+    });
+});
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Owner Registration</title>
+
+    <!-- ✅ CORRECT CSS FILE -->
+    <link rel="stylesheet" href="owner_registration _style.css">
+</head>
+<body>
+
+<!-- ✅ CANVAS BACKGROUND -->
+<canvas id="cyberCanvas"></canvas>
+
+<div class="container">
+
+    <div class="neon-border"></div>
+
+    <img src="car_img/carlogo.png" class="form-logo" alt="Logo">
+
+    <h2>Owner Registration</h2>
+
+    <form action="owner_registration.php" method="POST" enctype="multipart/form-data">
+
+        <div class="field">
+            <input type="text" name="full_name" required>
+            <label>Full Name</label>
+        </div>
+
+        <div class="field">
+            <input type="email" name="email" required>
+            <label>Email</label>
+        </div>
+
+        <div class="field">
+            <input type="tel" name="phone" pattern="[0-9]{10}" required>
+            <label>Phone</label>
+        </div>
+
+        <div class="field">
+            <input type="date" name="dob" required>
+            <label>DOB</label>
+        </div>
+
+        <div class="field">
+            <select name="gender" required>
+                <option value=""></option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+            </select>
+            <label>Gender</label>
+        </div>
+
+        <div class="field">
+            <input type="text" name="aadhaar" maxlength="12" required>
+            <label>Aadhaar Number</label>
+        </div>
+
+        <div class="field full">
+            <textarea name="address" rows="2" required></textarea>
+            <label>Address</label>
+        </div>
+
+        <div class="field">
+            <input type="password" name="password" required>
+            <label>Password</label>
+        </div>
+
+        <div class="field">
+            <input type="password" name="confirm_password" required>
+            <label>Confirm Password</label>
+        </div>
+
+        <div class="field">
+            <input type="datetime-local" name="registration_datetime" required>
+            <label>Registration Date</label>
+        </div>
+
+        <div class="field full">
+            <input type="file" name="owner_image" accept="image/*" required>
+        </div>
+
+        <button type="submit" name="register">Register</button>
+
+    </form>
+</div>
+
+<!-- ✅ CANVAS JS -->
+<script src="owner_registration.js"></script>
+
+</body>
+</html>

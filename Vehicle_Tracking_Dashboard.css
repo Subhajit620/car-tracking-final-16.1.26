@@ -1,0 +1,252 @@
+/* ===========================
+   Root Variables (Cyberpunk Theme)
+=========================== */
+:root {
+    --bg-panel: #1a1a2e;
+    --border-soft: rgba(255, 255, 255, 0.1);
+    --text-main: #ffffff;
+    --text-accent: #00ffff;
+    --alert-red: #ff4d4f;
+    --alert-green: #52c41a;
+    --alert-yellow: #faad14;
+    --neon-pink: #ff00ff;
+    --neon-cyan: #00ffff;
+}
+
+/* ===========================
+   Global Styles
+=========================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #0d0d20;
+    color: var(--text-main);
+}
+
+ul {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* ===========================
+   Dashboard Layout
+=========================== */
+.dashboard {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ===========================
+   Sidebar
+=========================== */
+.sidebar {
+    width: 220px;
+    background: linear-gradient(180deg, #1a1a2e, #162447);
+    color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
+}
+
+.sidebar h2 {
+    margin-bottom: 30px;
+    font-size: 20px;
+    color: var(--text-accent);
+    text-shadow: 0 0 6px var(--neon-cyan);
+}
+
+.sidebar ul li {
+    padding: 12px 10px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.sidebar ul li i {
+    margin-right: 10px;
+    color: var(--neon-cyan);
+}
+
+.sidebar ul li:hover,
+.sidebar ul li.active {
+    background: rgba(0, 255, 255, 0.1);
+    box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px var(--neon-pink);
+}
+
+/* ===========================
+   Main Content
+=========================== */
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+/* ===========================
+   Topbar
+=========================== */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.topbar h3 {
+    font-size: 22px;
+    color: var(--text-accent);
+    text-shadow: 0 0 6px var(--neon-cyan);
+}
+
+/* ===========================
+   Map Box
+=========================== */
+.map-box {
+    position: relative;
+    height: 280px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1a1a2e, #162447);
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 8px 24px rgba(0, 255, 255, 0.1),
+                0 0 12px rgba(255, 0, 255, 0.05);
+    margin-bottom: 20px;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.map-box:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 12px 36px rgba(0, 255, 255, 0.2),
+                0 0 24px rgba(255, 0, 255, 0.1);
+}
+
+.map-box iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 16px;
+}
+
+.map-box .speed {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    text-shadow: 0 0 6px var(--neon-cyan);
+}
+
+/* ===========================
+   Vehicle Info Box
+=========================== */
+.info-box {
+    background: linear-gradient(135deg, #1a1a2e, #162447);
+    border: 1px solid var(--border-soft);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgba(0, 255, 255, 0.08);
+}
+
+.info-box h4 {
+    margin-bottom: 12px;
+    color: var(--text-accent);
+}
+
+.info-box ul li {
+    margin-bottom: 6px;
+}
+
+/* ===========================
+   Bottom Cards
+=========================== */
+.bottom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.card {
+    flex: 1;
+    min-width: 200px;
+    background: linear-gradient(145deg, #1a1a2e, #162447);
+    border: 1px solid var(--border-soft);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(0, 255, 255, 0.08),
+                0 0 12px rgba(255, 0, 255, 0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 12px 36px rgba(0, 255, 255, 0.15),
+                0 0 20px rgba(255, 0, 255, 0.08);
+}
+
+.card h4 {
+    margin-bottom: 12px;
+    color: var(--text-accent);
+}
+
+/* ===========================
+   Alerts
+=========================== */
+.alert {
+    padding: 6px 12px;
+    border-radius: 12px;
+    color: #fff;
+    display: inline-block;
+    margin-bottom: 6px;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 4px #000;
+}
+
+.alert.red {
+    background: var(--alert-red);
+}
+
+.alert.green {
+    background: var(--alert-green);
+}
+
+.alert.yellow {
+    background: var(--alert-yellow);
+}
+
+.alert:hover {
+    box-shadow: 0 0 12px var(--neon-pink);
+}
+
+/* ===========================
+   Responsive
+=========================== */
+@media (max-width: 768px) {
+    .dashboard {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .bottom {
+        flex-direction: column;
+    }
+}

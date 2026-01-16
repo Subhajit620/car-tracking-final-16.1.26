@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk 3D Login</title>
+    <link rel="stylesheet" href="login_style.css">
+</head>
+<body>
+    <!-- Particles background -->
+    <canvas id="bg"></canvas>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-content">
+                <h2>Login</h2>
+                <form action="login.php" method="POST">
+                    <div class="input-group">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" id="email" placeholder="Enter your email" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" name="password" id="password" placeholder="Enter your password" required>
+                    </div>
+
+                    <button type="submit" name="login">Login</button>
+                    <p class="register-link">Don't have an account? <a href="owner_registration.html">Register</a></p>
+                    <!-- Forgot Password link -->
+                    <p class="forgot-password"><a href="forgot_password.html">Forgot Password?</a></p>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>
