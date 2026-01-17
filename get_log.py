@@ -15,8 +15,8 @@ db = mysql.connector.connect(
 cursor = db.cursor(dictionary=True)
 
 # ----------------- VEHICLE CONFIG -----------------
-CAR_ID = 1           # Must exist in 'cars' table
-VEHICLE_ID = "CAR001"
+CAR_ID = 1              # Must exist in 'cars' table, numeric ID
+VEHICLE_NUMBER = "CAR001"  # Any string for display/logging
 
 # ----------------- HELPER FUNCTIONS -----------------
 def random_lat():
@@ -84,23 +84,23 @@ try:
         # Insert into gps_logs table
         sql = """
         INSERT INTO gps_logs 
-        (car_id, vehicle_id, lat, lng, speed, seatbelt, fuel_level, engine_status, ignition,
+        (car_id, lat, lng, speed, seatbelt, fuel_level, engine_status, ignition,
          battery_voltage, segment_distance, odometer, timestamp)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         """
         cursor.execute(sql, (
-            CAR_ID, VEHICLE_ID, lat, lng, speed, seatbelt, fuel, engine, ignition,
+            CAR_ID, lat, lng, speed, seatbelt, fuel, engine, ignition,
             battery, segment_distance, odometer, timestamp
         ))
         db.commit()
 
-        # Print log for debugging
-        print(f"[{timestamp}] Vehicle {VEHICLE_ID} | Lat: {lat} | Lng: {lng} | Speed: {speed} km/h | "
+        # Print log for debugging (use VEHICLE_NUMBER)
+        print(f"[{timestamp}] Vehicle {VEHICLE_NUMBER} | Lat: {lat} | Lng: {lng} | Speed: {speed} km/h | "
               f"Seatbelt: {'ON' if seatbelt else 'OFF'} | Fuel: {fuel}% | Engine: {'ON' if engine else 'OFF'} | "
               f"Ignition: {'ON' if ignition else 'OFF'} | Battery: {battery} V | "
               f"Segment: {round(segment_distance,3)} km | Odometer: {round(odometer,3)} km")
 
-        time.sleep(5)  # insert every 15 seconds
+        time.sleep(5)  # insert every 5 seconds
 
 except KeyboardInterrupt:
     print("\n🛑 Logger stopped by user")

@@ -1,28 +1,45 @@
 <?php
-session_start();
+header('Content-Type: application/json');
 include 'db_connect.php';
 
-if(!isset($_SESSION['user_id'])){
-    header("Location: login.php");
+if(!isset($_GET['car_id'])){
+    echo json_encode(null);
     exit();
 }
 
-$owner_id = $_SESSION['user_id'];
-$car_db_id = intval($_GET['car_id']); // cars.id
+$car_id = intval($_GET['car_id']);
 
-// Optional: verify owner owns the car
-$stmt = $conn->prepare("SELECT * FROM cars WHERE id=? AND owner_id=?");
-$stmt->bind_param("ii", $car_db_id, $owner_id);
+// Fetch the latest GPS log for this car
+$stmt = $conn->prepare("
+    SELECT *
+    FROM gps_logs
+    WHERE car_id = ?
+    ORDER BY timestamp DESC
+    LIMIT 1
+");
+$stmt->bind_param("i", $car_id);
 $stmt->execute();
-$car = $stmt->get_result()->fetch_assoc();
+$data = $stmt->get_result()->fetch_assoc();
 
-if(!$car){
-    die("Unauthorized or car not found");
+if(!$data){
+    echo json_encode(null);
+    exit();
 }
 
-// Pass $car_db_id to JS
+// Return as JSON
+echo json_encode([
+    'vehicle_id'      => $data['vehicle_id'] ?? 'N/A',
+    'lat'             => $data['lat'],
+    'lng'             => $data['lng'],
+    'speed'           => $data['speed'],
+    'seatbelt'        => $data['seatbelt'],
+    'fuel_level'      => $data['fuel_level'],
+    'engine_status'   => $data['engine_status'],
+    'ignition'        => $data['ignition'],
+    'battery_voltage' => $data['battery_voltage'],
+    'odometer'        => $data['odometer'],
+    'segment_distance'=> $data['segment_distance'],
+    'timestamp'       => $data['timestamp']
+]);
 ?>
-<script>
-    var car_db_id = <?php echo $car_db_id; ?>;
-</script>
 

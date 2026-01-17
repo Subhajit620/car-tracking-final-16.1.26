@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Car Tracking Report Dashboard</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="Vehicle_Mileage_Report.css">
+</head>
+<body class="flex min-h-screen">
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar w-64 border-r border-slate-800 p-4">
+    <div class="flex items-center gap-2 py-6 px-2">
+        <div class="bg-blue-600 p-2 rounded-lg">
+            <i data-lucide="map-pin" class="w-5 h-5 text-white"></i>
+        </div>
+        <span class="text-xl font-bold">Fleet Reports</span>
+    </div>
+
+    <nav class="space-y-2">
+    <a href="Vehicle _Tracking _Dashboard.html" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+
+    
+</nav>
+
+</aside>
+
+<!-- ================= MAIN ================= -->
+<main class="flex-1 p-8">
+
+    <!-- HEADER -->
+    <header class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold">Vehicle Mileage Report</h1>
+    
+    </header>
+
+    <!-- KPI CARDS -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="kpi-card">
+            <p class="label"><i data-lucide="navigation"></i> Total Distance</p>
+            <p class="value text-blue-400">1,980 <span>km</span></p>
+        </div>
+
+        <div class="kpi-card">
+            <p class="label"><i data-lucide="fuel"></i> Fuel Used</p>
+            <p class="value text-green-400">150 <span>L</span></p>
+        </div>
+
+        <div class="kpi-card">
+            <p class="label"><i data-lucide="gauge"></i> Avg Mileage</p>
+            <p class="value text-orange-400">13.2 <span>km/L</span></p>
+        </div>
+
+        <div class="kpi-card">
+            <p class="label"><i data-lucide="trending-up"></i> Best Mileage</p>
+            <p class="value text-red-400">15.8 <span>km/L</span></p>
+        </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div class="chart-container lg:col-span-2">
+            <canvas id="mainChart"></canvas>
+        </div>
+
+        <div class="chart-container flex flex-col items-center justify-center">
+            <canvas id="gaugeChart"></canvas>
+            <!-- <img src="https://i.imgur.com/K1Yv0vR.png" class="car-img" alt="car"> -->
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <!-- <div class="table-container bg-slate-800/20 border border-slate-800 rounded-xl">
+        <table class="w-full text-left">
+            <thead class="bg-slate-800/50">
+                <tr>
+                    <th class="p-4">Vehicle No</th>
+                    <th class="p-4">Distance</th>
+                    <th class="p-4">Mileage</th>
+                    <th class="p-4">Status</th>
+                </tr>
+            </thead>
+            <tbody id="vehicleTable"></tbody>
+        </table>
+    </div> -->
+
+</main>
+
+<script src="Vehicle_Mileage_Report.js"></script>
+</body>
+</html>

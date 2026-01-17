@@ -1,0 +1,55 @@
+body {
+    background-color: #0b1120;
+    color: #f1f5f9;
+    font-family: 'Inter', sans-serif;
+}
+
+.kpi-card, .chart-container {
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    backdrop-filter: blur(10px);
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    color: #94a3b8;
+    transition: 0.2s;
+}
+
+.nav-link.active {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border-left: 3px solid #3b82f6;
+}
+
+.kpi-card .label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #94a3b8;
+    margin-bottom: 0.5rem;
+}
+
+.kpi-card .value {
+    font-size: 1.875rem;
+    font-weight: 700;
+}
+
+.kpi-card .value span {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: #64748b;
+}
+
+.car-img {
+    width: 200px;
+    margin-top: -40px;
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+}
