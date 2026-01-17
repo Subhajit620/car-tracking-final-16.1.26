@@ -21,7 +21,7 @@ $user_photo = (isset($_SESSION['user_photo']) && file_exists($_SESSION['user_pho
 
 // Add new car
 if(isset($_POST['add_car'])){
-    $car_id = intval($_POST['car_id']);
+    $car_id = trim($_POST['car_id']);
     $car_name = trim($_POST['car_name']);
     $car_model = trim($_POST['car_model']);
     $driver_name = trim($_POST['driver_name']);
@@ -107,7 +107,12 @@ $carsResult = $conn->query("SELECT * FROM cars WHERE owner_id=$user_id");
                     <td><?php echo htmlspecialchars($row['car_name']); ?></td>
                     <td><?php echo htmlspecialchars($row['car_model']); ?></td>
                     <td class="<?php echo strtolower($row['status']); ?>"><?php echo htmlspecialchars($row['status']); ?></td>
-                    <td><button class="view">View</button></td>
+                    <td>
+    <a href="Vehicle_Tracking_Dashboard.php?car_id=<?php echo $row['id']; ?>">
+        <button class="view">View</button>
+    </a>
+</td>
+
                     <td>
                         <button class="edit">Edit</button>
                         <button class="remove" onclick="return confirm('Are you sure?')">Remove</button>

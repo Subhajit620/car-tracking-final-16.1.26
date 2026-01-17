@@ -1,28 +1,28 @@
 <?php
-header("Content-Type: application/json");
+session_start();
+include 'db_connect.php';
 
-$conn = new mysqli("localhost", "gpsuser", "Saha@2003", "car");
-
-if ($conn->connect_error) {
-    echo json_encode(["error" => "Database connection failed"]);
-    exit;
+if(!isset($_SESSION['user_id'])){
+    header("Location: login.php");
+    exit();
 }
 
-$vehicle_id = "CAR001";
+$owner_id = $_SESSION['user_id'];
+$car_db_id = intval($_GET['car_id']); // cars.id
 
-$sql = "SELECT * FROM gps_logs 
-        WHERE vehicle_id='$vehicle_id' 
-        ORDER BY timestamp DESC 
-        LIMIT 1";
+// Optional: verify owner owns the car
+$stmt = $conn->prepare("SELECT * FROM cars WHERE id=? AND owner_id=?");
+$stmt->bind_param("ii", $car_db_id, $owner_id);
+$stmt->execute();
+$car = $stmt->get_result()->fetch_assoc();
 
-$result = $conn->query($sql);
-
-if ($result && $result->num_rows > 0) {
-    echo json_encode($result->fetch_assoc());
-} else {
-    echo json_encode(["error" => "No GPS Data"]);
+if(!$car){
+    die("Unauthorized or car not found");
 }
 
-$conn->close();
+// Pass $car_db_id to JS
 ?>
+<script>
+    var car_db_id = <?php echo $car_db_id; ?>;
+</script>
 
