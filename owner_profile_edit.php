@@ -34,12 +34,25 @@ if (isset($_POST['update'])) {
         : $user['password'];
 
     if (!empty($_FILES['owner_image']['name'])) {
-        if (!is_dir("uploads")) mkdir("uploads");
-        $img = time().'_'.$_FILES['owner_image']['name'];
-        move_uploaded_file($_FILES['owner_image']['tmp_name'], "uploads/".$img);
+    if (!is_dir("uploads")) mkdir("uploads");
+
+    // Sanitize filename: remove spaces, special characters
+    $originalName = pathinfo($_FILES['owner_image']['name'], PATHINFO_FILENAME);
+    $extension = pathinfo($_FILES['owner_image']['name'], PATHINFO_EXTENSION);
+
+    $safeName = preg_replace("/[^A-Za-z0-9_-]/", "_", $originalName); // replace spaces and special chars
+    $img = time() . '_' . $safeName . '.' . $extension;
+
+    $targetPath = "uploads/" . $img;
+    if(move_uploaded_file($_FILES['owner_image']['tmp_name'], $targetPath)){
+        $img = $targetPath; // Save full path in DB
     } else {
-        $img = $user['owner_image'];
+        $img = $user['owner_image']; // fallback
     }
+} else {
+    $img = $user['owner_image'];
+}
+
 
     $stmt = $conn->prepare("
         UPDATE owners SET

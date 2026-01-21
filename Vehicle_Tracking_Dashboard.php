@@ -48,7 +48,13 @@ if(!$car){
         <ul>
             <li class="active"><i class="fa fa-home"></i> Dashboard</li>
             <li><i class="fa fa-clock"></i> Trip History</li>
-            <li><i class="fa fa-file"></i> Reports</li>
+            <li>
+    <a href="Vehicle_Mileage_Report.php?car_id=<?php echo $car_db_id; ?>">
+        <i class="fa fa-file"></i> Reports
+    </a>
+</li>
+
+
             <li><i class="fa fa-user"></i> Log Data</li>
             <li><i class="fa fa-sign-out-alt"></i> Logout</li>
         </ul>
