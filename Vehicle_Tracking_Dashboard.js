@@ -88,8 +88,14 @@ function updateDashboard(data) {
     lastLng = lng;
 
     // Update route line
-    routePoints.push([lat, lng]);
-    routeLine.setLatLngs(routePoints);
+ routePoints.push([lat, lng]);
+
+// Prevent memory overload after long tracking
+if (routePoints.length > 300) {
+    routePoints.shift();
+}
+
+routeLine.setLatLngs(routePoints);
 
     // ===== Update vehicle info =====
     document.getElementById("vehicle_id").innerText = data.vehicle_id;
@@ -115,12 +121,17 @@ function updateDashboard(data) {
     if (data.ignition == 0) alertsDiv.innerHTML += `<p class="alert green">Ignition OFF</p>`;
 }
 
-// 10️⃣ Fetch GPS from PHP
-function fetchData() {
+// 10️⃣ Fetch GPS fro
+ function fetchData() {
     fetch('Vehicle_Tracking_Dashboard_data.php?car_id=' + car_db_id)
-        .then(response => response.json())
-        .then(data => updateDashboard(data))
-        .catch(err => console.error(err));
+        .then(response => {
+            if (!response.ok) throw new Error("Server error");
+            return response.json();
+        })
+        .then(data => {
+            if (data) updateDashboard(data);
+        })
+        .catch(err => console.warn("Server not responding..."));
 }
 
 

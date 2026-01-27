@@ -1,33 +1,73 @@
 <?php
-// ================= DATABASE CONNECTION =================
-$conn = new mysqli("localhost", "root", "", "car");
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+session_start();
+include 'db_connect.php';
+
+// ================= USER AUTH CHECK =================
+if(!isset($_SESSION['user_id'])){
+    header("Location: login.php");
+    exit();
 }
 
-// ================= FILTERS =================
-$where = "1";
+$owner_id = $_SESSION['user_id'];
+$car_db_id = intval($_GET['car_id'] ?? 0); // get car id from URL
+
+// ================= VERIFY OWNER =================
+if($car_db_id > 0){
+    $stmt = $conn->prepare("SELECT * FROM cars WHERE id=? AND owner_id=?");
+    $stmt->bind_param("ii", $car_db_id, $owner_id);
+    $stmt->execute();
+    $car = $stmt->get_result()->fetch_assoc();
+
+    if(!$car){
+        die("Unauthorized or car not found");
+    }
+}
+
+// ================= FILTER LOGIC =================
+$whereClauses = [];
 $params = [];
 $types = "";
 
+// Filter by car_id (from dashboard)
+if ($car_db_id > 0) {
+    $whereClauses[] = "car_id = ?";
+    $params[] = $car_db_id;
+    $types .= "i";
+}
+
+// Optional search by car_id (from search box)
 if (!empty($_GET['search'])) {
-    $where .= " AND vehicle_id LIKE ?";
+    $whereClauses[] = "car_id LIKE ?";
     $params[] = "%" . $_GET['search'] . "%";
     $types .= "s";
 }
 
+// Date range filter
 if (!empty($_GET['from']) && !empty($_GET['to'])) {
-    $where .= " AND timestamp BETWEEN ? AND ?";
-    $params[] = $_GET['from'] . " 00:00:00";
-    $params[] = $_GET['to'] . " 23:59:59";
+    $fromDate = $_GET['from'] . " 00:00:00";
+    $toDate   = $_GET['to'] . " 23:59:59";
+
+    $whereClauses[] = "timestamp BETWEEN ? AND ?";
+    $params[] = $fromDate;
+    $params[] = $toDate;
     $types .= "ss";
 }
 
-$sql = "SELECT * FROM gps_logs WHERE $where ORDER BY timestamp DESC LIMIT 100";
+// Default if no filters
+$whereSQL = count($whereClauses) ? implode(" AND ", $whereClauses) : "1";
+
+// ================= QUERY =================
+$sql = "SELECT * FROM gps_logs WHERE $whereSQL ORDER BY timestamp DESC LIMIT 100";
 $stmt = $conn->prepare($sql);
-if ($params) {
+
+if(!$stmt){
+    die("SQL Error: " . $conn->error);
+}
+
+if($params){
     $stmt->bind_param($types, ...$params);
 }
+
 $stmt->execute();
 $result = $stmt->get_result();
 ?>
@@ -48,7 +88,7 @@ $result = $stmt->get_result();
 <!-- ================= BACK + LOGOUT BUTTONS ================= -->
 <div class="flex justify-between mb-6">
   <!-- BACK BUTTON -->
-  <a href="Vehicle_Tracking_Dashboard.html"
+  <a href="Vehicle_Tracking_Dashboard.php?car_id=<?= $car_db_id ?>"
      class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-500">
     <i data-lucide="arrow-left"></i>
     Back
@@ -66,6 +106,8 @@ $result = $stmt->get_result();
 
 <!-- ================= SEARCH FORM ================= -->
 <form method="GET" class="flex flex-wrap gap-4 items-end mb-6">
+  <input type="hidden" name="car_id" value="<?= $car_db_id ?>">
+  
   <input type="text" name="search" placeholder="Search Vehicle"
     class="px-4 py-2 w-72 rounded-lg bg-slate-800 border border-slate-700 text-white"
     value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>">
@@ -88,9 +130,17 @@ $result = $stmt->get_result();
     Search
   </button>
 
-  <a href="logs_data.php" class="px-5 py-2 bg-slate-700 rounded-lg hover:bg-slate-600">
+  <a href="logs_data.php?car_id=<?= $car_db_id ?>" class="px-5 py-2 bg-slate-700 rounded-lg hover:bg-slate-600">
     Reset
   </a>
+<a href="export_logs_pdf.php?car_id=<?= $car_db_id ?>
+    &search=<?= urlencode($_GET['search'] ?? '') ?>
+    &from=<?= $_GET['from'] ?? '' ?>
+    &to=<?= $_GET['to'] ?? '' ?>"
+   class="px-5 py-2 bg-orange-600 rounded-lg hover:bg-orange-500">
+   Export PDF
+</a>
+
 </form>
 
 <!-- ================= TABLE ================= -->
@@ -113,7 +163,7 @@ $result = $stmt->get_result();
         <?php while($row = $result->fetch_assoc()): ?>
           <tr class="border-b border-slate-700 hover:bg-slate-700/20">
             <td class="p-4"><?= $row['timestamp'] ?></td>
-            <td class="p-4"><?= htmlspecialchars($row['vehicle_id']) ?></td>
+            <td class="p-4"><?= htmlspecialchars($row['car_id']) ?></td>
             <td class="p-4"><?= $row['speed'] ?? '-' ?></td>
             <td class="p-4"><?= $row['fuel_level'] ?? '-' ?></td>
             <td class="p-4"><?= $row['odometer'] ?? '-' ?></td>

@@ -55,7 +55,12 @@ if(!$car){
 </li>
 
 
-            <li><i class="fa fa-user"></i> Log Data</li>
+            <li>
+    <a href="logs_data.php?car_id=<?php echo $car_db_id; ?>">
+        <i class="fa fa-user"></i> Log Data
+    </a>
+</li>
+
             <li><i class="fa fa-sign-out-alt"></i> Logout</li>
         </ul>
     </aside>

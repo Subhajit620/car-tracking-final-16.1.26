@@ -3,51 +3,92 @@ session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Redirect if not logged in
-if(!isset($_SESSION['user_id'])){
+include 'db_connect.php';
+
+// ================= USER AUTH CHECK =================
+if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-// Include DB connection
-include 'db_connect.php';
-
-// Get session info safely
 $user_id = $_SESSION['user_id'];
 $user_name = $_SESSION['user_name'] ?? 'User';
 $user_photo = (isset($_SESSION['user_photo']) && file_exists($_SESSION['user_photo'])) 
     ? $_SESSION['user_photo'] 
     : 'uploads/default.png';
 
-// Add new car
-if(isset($_POST['add_car'])){
-    $car_id = trim($_POST['car_id']);
+// ================= HANDLE REMOVE CAR =================
+if (isset($_GET['remove_id'])) {
+    $remove_id = intval($_GET['remove_id']); // sanitize input
+
+    // Delete only if this car belongs to logged-in user
+    $stmt = $conn->prepare("DELETE FROM cars WHERE id=? AND owner_id=?");
+    $stmt->bind_param("ii", $remove_id, $user_id);
+    $stmt->execute();
+
+    header("Location: dashboard.php");
+    exit();
+}
+
+// ================= ADD NEW CAR =================
+if (isset($_POST['add_car'])) {
     $car_name = trim($_POST['car_name']);
     $car_model = trim($_POST['car_model']);
     $driver_name = trim($_POST['driver_name']);
     $gps_device_id = trim($_POST['gps_device_id']);
 
     $stmt = $conn->prepare("INSERT INTO cars (owner_id, car_name, car_model, driver_name, gps_device_id, status, created_at) VALUES (?, ?, ?, ?, ?, 'Offline', NOW())");
-    if($stmt){
+    if ($stmt) {
         $stmt->bind_param("issss", $user_id, $car_name, $car_model, $driver_name, $gps_device_id);
-        if(!$stmt->execute()){
-            die("Add car failed: " . $stmt->error);
-        }
+        $stmt->execute();
         header("Location: dashboard.php");
         exit();
     } else {
-        die("Prepare failed: " . $conn->error);
+        die("Add car failed: " . $conn->error);
     }
 }
 
-// Fetch car stats
-$totalCars = $conn->query("SELECT * FROM cars WHERE owner_id=$user_id")->num_rows ?? 0;
-$carsOnline = $conn->query("SELECT * FROM cars WHERE owner_id=$user_id AND status='Online'")->num_rows ?? 0;
-$carsOffline = $conn->query("SELECT * FROM cars WHERE owner_id=$user_id AND status='Offline'")->num_rows ?? 0;
-
-// Fetch cars for list
+// ================= FETCH CARS =================
 $carsResult = $conn->query("SELECT * FROM cars WHERE owner_id=$user_id");
+
+// Initialize stats
+$totalCars = 0;
+$carsOnline = 0;
+$carsOffline = 0;
+
+// Calculate live status based on last GPS log
+$carsData = [];
+if ($carsResult && $carsResult->num_rows > 0) {
+    while ($car = $carsResult->fetch_assoc()) {
+        $totalCars++;
+
+        // Fetch last GPS log timestamp
+        $stmt = $conn->prepare("SELECT timestamp FROM gps_logs WHERE car_id=? ORDER BY timestamp DESC LIMIT 1");
+        $stmt->bind_param("i", $car['id']);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $lastLog = $res->fetch_assoc();
+
+        $status = 'Offline';
+        if ($lastLog) {
+            $lastTime = strtotime($lastLog['timestamp']);
+            $now = time();
+            if (($now - $lastTime) <= 15) { // last 15 seconds
+                $status = 'Online';
+                $carsOnline++;
+            } else {
+                $carsOffline++;
+            }
+        } else {
+            $carsOffline++;
+        }
+
+        $car['live_status'] = $status;
+        $carsData[] = $car;
+    }
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -141,24 +182,24 @@ input::placeholder{color:#ccc;}
                 <th>Live Location</th>
                 <th>Action</th>
             </tr>
-            <?php if($carsResult && $carsResult->num_rows > 0): ?>
-                <?php while($row = $carsResult->fetch_assoc()): ?>
+            <?php if(!empty($carsData)): ?>
+                <?php foreach($carsData as $row): ?>
                 <tr>
                     <td><?php echo htmlspecialchars($row['car_id'] ?? $row['id']); ?></td>
                     <td><?php echo htmlspecialchars($row['car_name']); ?></td>
                     <td><?php echo htmlspecialchars($row['car_model']); ?></td>
-                    <td class="<?php echo strtolower($row['status']); ?>"><?php echo htmlspecialchars($row['status']); ?></td>
+                    <td class="<?php echo strtolower($row['live_status']); ?>"><?php echo $row['live_status']; ?></td>
                     <td>
                         <a href="Vehicle_Tracking_Dashboard.php?car_id=<?php echo $row['id']; ?>">
                             <button class="view">View</button>
                         </a>
                     </td>
                     <td>
-                        <button class="edit">Edit</button>
-                        <button class="remove" onclick="return confirm('Are you sure?')">Remove</button>
+                        <a href="car_edit.php?id=<?php echo $row['id']; ?>"><button class="edit">Edit</button></a>
+                        <a href="dashboard.php?remove_id=<?php echo $row['id']; ?>" onclick="return confirm('Are you sure you want to remove this car?')"><button class="remove">Remove</button></a>
                     </td>
                 </tr>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
             <?php else: ?>
                 <tr><td colspan="6" style="text-align:center;">No cars found</td></tr>
             <?php endif; ?>
