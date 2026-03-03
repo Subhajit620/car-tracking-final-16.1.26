@@ -5,26 +5,40 @@ error_reporting(E_ALL);
 
 include 'db_connect.php';
 
-// ================= USER AUTH CHECK =================
-if (!isset($_SESSION['user_id'])) {
+// ================= AUTH CHECK =================
+if (isset($_SESSION['admin_id'])) {
+    // Super Admin
+    $is_admin = true;
+    $user_name = $_SESSION['admin_name'];
+    $user_photo = 'uploads/default.png'; // you can change for admin
+} elseif (isset($_SESSION['user_id'])) {
+    // Normal Owner
+    $is_admin = false;
+    $user_id = $_SESSION['user_id'];
+    $user_name = $_SESSION['user_name'] ?? 'User';
+    $user_photo = (isset($_SESSION['user_photo']) && file_exists($_SESSION['user_photo']))
+        ? $_SESSION['user_photo']
+        : 'uploads/default.png';
+} else {
     header("Location: login.php");
     exit();
 }
-
-$user_id = $_SESSION['user_id'];
-$user_name = $_SESSION['user_name'] ?? 'User';
-$user_photo = (isset($_SESSION['user_photo']) && file_exists($_SESSION['user_photo'])) 
-    ? $_SESSION['user_photo'] 
-    : 'uploads/default.png';
 
 // ================= HANDLE REMOVE CAR =================
 if (isset($_GET['remove_id'])) {
     $remove_id = intval($_GET['remove_id']); // sanitize input
 
-    // Delete only if this car belongs to logged-in user
-    $stmt = $conn->prepare("DELETE FROM cars WHERE id=? AND owner_id=?");
-    $stmt->bind_param("ii", $remove_id, $user_id);
-    $stmt->execute();
+    if ($is_admin) {
+        // Super admin can remove any car
+        $stmt = $conn->prepare("DELETE FROM cars WHERE id=?");
+        $stmt->bind_param("i", $remove_id);
+        $stmt->execute();
+    } else {
+        // Owner can remove only own cars
+        $stmt = $conn->prepare("DELETE FROM cars WHERE id=? AND owner_id=?");
+        $stmt->bind_param("ii", $remove_id, $user_id);
+        $stmt->execute();
+    }
 
     header("Location: dashboard.php");
     exit();
@@ -37,9 +51,15 @@ if (isset($_POST['add_car'])) {
     $driver_name = trim($_POST['driver_name']);
     $gps_device_id = trim($_POST['gps_device_id']);
 
+    if ($is_admin) {
+        $owner_id = intval($_POST['owner_id']); // admin must select owner
+    } else {
+        $owner_id = $user_id;
+    }
+
     $stmt = $conn->prepare("INSERT INTO cars (owner_id, car_name, car_model, driver_name, gps_device_id, status, created_at) VALUES (?, ?, ?, ?, ?, 'Offline', NOW())");
     if ($stmt) {
-        $stmt->bind_param("issss", $user_id, $car_name, $car_model, $driver_name, $gps_device_id);
+        $stmt->bind_param("issss", $owner_id, $car_name, $car_model, $driver_name, $gps_device_id);
         $stmt->execute();
         header("Location: dashboard.php");
         exit();
@@ -49,14 +69,17 @@ if (isset($_POST['add_car'])) {
 }
 
 // ================= FETCH CARS =================
-$carsResult = $conn->query("SELECT * FROM cars WHERE owner_id=$user_id");
+if ($is_admin) {
+    $carsResult = $conn->query("SELECT cars.*, owners.full_name AS owner_name FROM cars LEFT JOIN owners ON cars.owner_id = owners.id");
+} else {
+    $carsResult = $conn->query("SELECT * FROM cars WHERE owner_id=$user_id");
+}
 
 // Initialize stats
 $totalCars = 0;
 $carsOnline = 0;
 $carsOffline = 0;
 
-// Calculate live status based on last GPS log
 $carsData = [];
 if ($carsResult && $carsResult->num_rows > 0) {
     while ($car = $carsResult->fetch_assoc()) {
@@ -133,7 +156,7 @@ button{padding:6px 12px; border:none; border-radius:6px; cursor:pointer;}
 button.view{background:#3498db;color:#fff;} 
 button.edit{background:#2ecc71;color:#fff;} 
 button.remove{background:#e74c3c;color:#fff;} 
-.add-car form input{ padding:8px; margin-right:10px; margin-bottom:10px; border-radius:6px; border:1px solid #555; background:rgba(0,0,0,0.25); color:#fff; } 
+.add-car form input, .add-car form select{ padding:8px; margin-right:10px; margin-bottom:10px; border-radius:6px; border:1px solid #555; background:rgba(0,0,0,0.25); color:#fff; } 
 .add-car form button{ background:#3498db;color:#fff; padding:8px 15px; border:none; border-radius:6px; cursor:pointer; } 
 input::placeholder{color:#ccc;} 
 .car-list input[type="text"]{ width:100%; padding:8px; margin-bottom:10px; border-radius:6px; border:1px solid #555; background:rgba(0,0,0,0.25); color:#fff; }
@@ -157,9 +180,11 @@ input::placeholder{color:#ccc;}
     <div class="user-info">
         <img src="<?php echo $user_photo; ?>" class="profile-pic" alt="User">
         <div class="user-name"><?php echo htmlspecialchars($user_name); ?></div>
+        <?php if(!$is_admin): ?>
         <form action="owner_profile_edit.php" method="get">
             <button type="submit" class="edit-profile-btn">Edit Profile</button>
         </form>
+        <?php endif; ?>
     </div>
 
     <!-- CAR STATS -->
@@ -178,6 +203,7 @@ input::placeholder{color:#ccc;}
                 <th>Car ID</th>
                 <th>Car Name</th>
                 <th>Car Model</th>
+                <?php if($is_admin): ?><th>Owner</th><?php endif; ?>
                 <th>Status</th>
                 <th>Live Location</th>
                 <th>Action</th>
@@ -185,9 +211,10 @@ input::placeholder{color:#ccc;}
             <?php if(!empty($carsData)): ?>
                 <?php foreach($carsData as $row): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($row['car_id'] ?? $row['id']); ?></td>
+                    <td><?php echo htmlspecialchars($row['id']); ?></td>
                     <td><?php echo htmlspecialchars($row['car_name']); ?></td>
                     <td><?php echo htmlspecialchars($row['car_model']); ?></td>
+                    <?php if($is_admin): ?><td><?php echo htmlspecialchars($row['owner_name']); ?></td><?php endif; ?>
                     <td class="<?php echo strtolower($row['live_status']); ?>"><?php echo $row['live_status']; ?></td>
                     <td>
                         <a href="Vehicle_Tracking_Dashboard.php?car_id=<?php echo $row['id']; ?>">
@@ -201,7 +228,7 @@ input::placeholder{color:#ccc;}
                 </tr>
                 <?php endforeach; ?>
             <?php else: ?>
-                <tr><td colspan="6" style="text-align:center;">No cars found</td></tr>
+                <tr><td colspan="<?php echo $is_admin?7:6; ?>" style="text-align:center;">No cars found</td></tr>
             <?php endif; ?>
         </table>
     </div>
@@ -210,6 +237,17 @@ input::placeholder{color:#ccc;}
     <div class="add-car">
         <h2>Add New Car</h2>
         <form method="post">
+            <?php if($is_admin): ?>
+            <select name="owner_id" required>
+                <option value="">Select Owner</option>
+                <?php
+                $owners = $conn->query("SELECT id, full_name FROM owners");
+                while($o = $owners->fetch_assoc()){
+                    echo "<option value='{$o['id']}'>{$o['full_name']}</option>";
+                }
+                ?>
+            </select>
+            <?php endif; ?>
             <input type="text" name="car_name" placeholder="Car Name" required>
             <input type="text" name="car_model" placeholder="Car Model" required>
             <input type="text" name="driver_name" placeholder="Driver Name" required>
@@ -228,7 +266,7 @@ function searchCar(input){
     for(let i=1; i<tr.length; i++){
         let tds = tr[i].getElementsByTagName("td");
         let found = false;
-        for(let j=0; j<3; j++){ // first 3 columns
+        for(let j=0; j<tds.length; j++){
             if(tds[j]){
                 let txtValue = tds[j].textContent || tds[j].innerText;
                 if(txtValue.toUpperCase().indexOf(filter) > -1){
