@@ -60,9 +60,12 @@ if(!$car){
         <i class="fa fa-user"></i> Log Data
     </a>
 </li>
-
-            <li><i class="fa fa-sign-out-alt"></i> Logout</li>
-        </ul>
+<li>
+    <a href="logout.php">
+        <i class="fa fa-sign-out-alt"></i> Logout
+    </a>
+</li>
+     </ul>
     </aside>
 
     <!-- MAIN -->
